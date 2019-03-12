@@ -45,6 +45,8 @@ class Video:
     def __repr__(self):
         return "Video Object    Title:{}   ID:{}    IS READY:{}".format(self.name, self.id, self.is_ready())
 
+    def __hash__(self):
+        return (self.id, self.name)
 class Channel:
     def __init__(self, channel_id, video_limit=10, update_videos=True):
         self.channel_id = channel_id

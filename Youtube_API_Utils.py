@@ -14,7 +14,6 @@ def fetch_channel_information(channel_id):
     res = requests.get(CHANNELS_ENDPOINT, params)
     if res.status_code != 200:
         raise Exception("Something went wrong with the request: " + res.json())
-
     return res.json()
 
 
@@ -34,11 +33,7 @@ def fetch_videos_from_playlist(playlist_id, max_results = 10):
         vid_list.append({"id" : item["contentDetails"]["videoId"],
                          "title" : item["snippet"]["title"],
                          "published" : item["contentDetails"]["videoPublishedAt"]})
-
     return vid_list
-
-
-fetch_videos_from_playlist('UU6107grRI4m0o2-emgoDnAA')
 
 
 

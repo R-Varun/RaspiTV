@@ -23,9 +23,13 @@ class PQ:
         popped = heapq.heappop(self.back)
         return popped[::-1]
 
+    def peek(self):
+        return self.back[0][1]
+
     def size(self):
         return len(self.back)
 
+# Cache and queue for video playback
 class Video_Cache_Manager:
     def __init__(self, save_dir="/cache_manager", size_limit=4):
         self.save_dir = Path(save_dir)
@@ -56,6 +60,8 @@ class Video_Cache_Manager:
         if delete:
             self.delete_video_from_disk(video)
         return video
+    def peek_video(self):
+        return self.data_struct.peek()
 
     @staticmethod
     def delete_video_from_disk(video):
@@ -78,6 +84,10 @@ class Video_Cache_Manager:
         with open(self.save_dir) as file:
             pickle.dump(self, file)
 
+    def queue_size(self):
+        return len(self.data_struct_exists)
+    def video_in_queue(self, video):
+        return video in self.data_struct_exists
     # Deletes all disk items and clears in-memory data structures
     def clear_all(self):
         self.data_struct = PQ()
