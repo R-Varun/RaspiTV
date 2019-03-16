@@ -52,9 +52,12 @@ def downloading(context, videos_predownloaded = 3):
 
 
 def playing(context):
-    context.status = Status.PLAYING
-    cur_video = context.cache_manager.peek_video()
+    if context.cache_manager.queue_size() == 0:
+        idling(context)
+        return
 
+    context.status = Status.PLAYING
+    cur_video = context.cache_manager.pop_video()
 
     if cur_video.is_ready():
         play_context_video(context, video_path=cur_video.disk_path)
@@ -66,11 +69,17 @@ def quit_context_player(context):
     if context.player != None:
         context.player.quit()
 
-def play_context_video(context, video_path):
+def player_position_callback(p, a):
+    print(p, a)
+def play_context_video(context, video_path, looping=False):
     quit_context_player(context)
-    context.player = OMXPlayer(video_path)
+    if looping:
+        context.player = OMXPlayer(video_path, args=["--loop"])
+    else:
+        context.player = OMXPlayer(video_path)
     # context.player.set_aspect_mode('stretch')
-    context.player.play()
+    context.player.set_alpha(100)
+    context.player.positionEvent = player_position_callback
     context.player.play()
 
 
@@ -78,7 +87,7 @@ def idling(context, guaranteed_videos=5):
     context.status = Status.IDLE
     print("IDLING, finding videos to watch")
 
-    play_context_video(context, STATIC_VIDEO_PATH)
+    play_context_video(context, STATIC_VIDEO_PATH, looping=True)
 
     if not context.cache_manager.queue_size() >= guaranteed_videos:
         num_videos = 5
@@ -112,5 +121,8 @@ if __name__ == "__main__":
     #     print(cur_video.name)
     context = Operating_Context(load_manager=True)
     print(context.seen_videos)
-    if context.status == Status.IDLE:
-        idling(context)
+    while True:
+        if context.status == Status.IDLE:
+            idling(context)
+        else:
+            playing(context)
