@@ -104,12 +104,12 @@ class Video_Cache_Manager:
 
     def save(self):
         with open(str(self.save_dir), "wb") as file:
-            pickle.dump(self, file)
+            pickle.dump(self, file, protocol=pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
     def load(save_dir=DEFAULT_SAVE_DIR):
         if Path(save_dir).exists():
-            return pickle.load(open(str(save_dir)))
+            return pickle.load(open(str(save_dir)), protocol=pickle.HIGHEST_PROTOCOL)
         return None
 
 if __name__ == "__main__":
