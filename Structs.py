@@ -25,6 +25,8 @@ class Video:
 
         if disk_path != None:
             self.disk_path = Path(disk_path)
+        else:
+            self.disk_path = None
 
     @staticmethod
     def url_from_id(video_id):
@@ -45,8 +47,15 @@ class Video:
     def __repr__(self):
         return "Video Object    Title:{}   ID:{}    IS READY:{}".format(self.name, self.id, self.is_ready())
 
-    def __hash__(self):
-        return (self.id, self.name)
+    def __cmp__(self, other):
+        return hash(self) - hash(other)
+
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
+
+    # This shit suck
+    # def __hash__(self):
+    #     return (self.id, self.name)
 class Channel:
     def __init__(self, channel_id, video_limit=10, update_videos=True):
         self.channel_id = channel_id

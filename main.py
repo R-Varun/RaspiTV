@@ -3,6 +3,11 @@ from Structs import *
 from enum import Enum
 import time
 
+# TRIAL FOR OMX PLAYER
+from pathlib import Path
+from time import sleep
+
+
 class Status(Enum):
     IDLE = 0
     PLAYING = 1
@@ -18,16 +23,18 @@ class Operating_Context:
 def reload_playlist(context, videos_per_channel=5):
     context.cache_manager.clear_all()
     channels = [Channel(x, video_limit=videos_per_channel) for x in config.CHANNEL_LIST]
+    # print(channels)
     for channel in channels:
         videos = channel.videos
         for video in videos:
             # If the video is not in queue or in seen videos, queue it up
-            if video not in context.seen_videos and video not in context.cache_manager.video_in_queue(video):
-                context.cache_manager.add_video(video)
+            if video not in context.seen_videos and not context.cache_manager.video_in_queue(video):
+                context.cache_manager.add_video(video, video.published_date)
+                print("added video ", context.cache_manager.queue_size())
 
 def downloading(context, videos_predownloaded = 3):
     context.status = Status.DOWNLOADING
-    top_n_videos = [context.cache_manager.pop(x) for x in range(videos_predownloaded)]
+    top_n_videos = [context.cache_manager.pop_video(x) for x in range(videos_predownloaded)]
     for video in top_n_videos:
         if video != None:
             video.download()
@@ -37,11 +44,23 @@ def downloading(context, videos_predownloaded = 3):
 
 
 def playing(context):
+    from omxplayer.player import OMXPlayer
     context.status = Status.PLAYING
     cur_video = context.cache_manager.peek_video()
-    if cur_video.is_ready():
 
+    player = OMXPlayer(cur_video.disk_path)
+    sleep(2.5)
+    player.pause()
+    sleep(2)
+    player.set_aspect_mode('stretch')
+    player.play()
+    sleep(5)
+
+
+    if cur_video.is_ready():
+        pass
     else:
+        pass
 
 def idling(context, guaranteed_videos=5):
     context.status = Status.IDLE
@@ -57,7 +76,7 @@ def idling(context, guaranteed_videos=5):
             if context.cache_manager.queue_size() >= guaranteed_videos:
                 retry = False
             else:
-                print("Waiting {} seconds to fetch new videos")
+                print("Waiting {} seconds to fetch new videos".format(retry_wait))
                 time.sleep(retry_wait)
                 retry_wait **= 2
                 num_videos += 5
@@ -78,5 +97,6 @@ if __name__ == "__main__":
     #     cur_video = cache_manager.pop_video(delete=True)
     #     print(cur_video.name)
     context = Operating_Context()
+    print(context.seen_videos)
     if context.status == Status.IDLE:
         idling(context)

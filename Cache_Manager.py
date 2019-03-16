@@ -46,7 +46,7 @@ class Video_Cache_Manager:
         self.add_video(video, priority=priority)
     # Default add
     def add_video(self, video, priority=None):
-        assert(video.disk_path.exists())
+        # assert(video.disk_path.exists())
 
         if priority == None:
             priority = datetime.datetime.now()
