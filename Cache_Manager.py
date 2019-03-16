@@ -32,7 +32,7 @@ class PQ:
 # Cache and queue for video playback
 class Video_Cache_Manager:
 
-    DEFAULT_SAVE_DIR = "./cache_manager.pickle"
+    DEFAULT_SAVE_DIR = os.path.join(os.getcwd(), "cache_manager.pickle")
     DEFAULT_SIZE_LIMIT = 4
     def __init__(self, save_dir=DEFAULT_SAVE_DIR, size_limit=DEFAULT_SIZE_LIMIT):
         self.save_dir = Path(save_dir)
