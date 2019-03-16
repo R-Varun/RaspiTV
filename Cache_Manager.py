@@ -31,7 +31,10 @@ class PQ:
 
 # Cache and queue for video playback
 class Video_Cache_Manager:
-    def __init__(self, save_dir="/cache_manager", size_limit=4):
+
+    DEFAULT_SAVE_DIR = "./cache_manager.pickle"
+    DEFAULT_SIZE_LIMIT = 4
+    def __init__(self, save_dir=DEFAULT_SAVE_DIR, size_limit=DEFAULT_SIZE_LIMIT):
         self.save_dir = Path(save_dir)
 
         self.cache_dir = Path(config.VIDEO_CACHE_DIR)
@@ -39,11 +42,12 @@ class Video_Cache_Manager:
             os.mkdir(self.cache_dir)
         self.data_struct = PQ()
         self.data_struct_exists = set()
-
+        self.save()
 
     def add_and_download_video(self, video, priority=None):
         video.download()
         self.add_video(video, priority=priority)
+
     # Default add
     def add_video(self, video, priority=None):
         # assert(video.disk_path.exists())
@@ -53,12 +57,15 @@ class Video_Cache_Manager:
         print(self.data_struct)
         self.data_struct.push(video, priority)
         self.data_struct_exists.add(video)
+        self.save()
 
     def pop_video(self, delete=False):
         video = self.data_struct.pop()
         self.data_struct_exists.remove(video)
         if delete:
             self.delete_video_from_disk(video)
+
+        self.save()
         return video
     def peek_video(self):
         return self.data_struct.peek()
@@ -74,26 +81,36 @@ class Video_Cache_Manager:
         else:
             print("Disk location not found!")
 
-    def default_generate_video_name_cache(self, video):
-        return video.name + ""
-
     def num_videos(self):
         return self.data_struct.size()
 
-    def save(self):
-        with open(self.save_dir) as file:
-            pickle.dump(self, file)
-
     def queue_size(self):
         return len(self.data_struct_exists)
+
     def video_in_queue(self, video):
         return video in self.data_struct_exists
+
     # Deletes all disk items and clears in-memory data structures
     def clear_all(self):
         self.data_struct = PQ()
         for video in self.data_struct_exists:
             self.delete_video_from_disk(video)
         self.data_struct_exists = set()
+        self.save()
+
+    ###################
+    # DATA PERSISTENCE
+    ###################
+
+    def save(self):
+        with open(self.save_dir) as file:
+            pickle.dump(self, file)
+
+    @staticmethod
+    def load(save_dir=DEFAULT_SAVE_DIR):
+        if Path(save_dir).exists():
+            return pickle.load(open(save_dir))
+        return None
 
 if __name__ == "__main__":
     c = Video_Cache_Manager()

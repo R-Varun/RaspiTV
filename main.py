@@ -2,11 +2,14 @@ from Cache_Manager import Video_Cache_Manager
 from Structs import *
 from enum import Enum
 import time
+from omxplayer.player import OMXPlayer
 
 # TRIAL FOR OMX PLAYER
 from pathlib import Path
 from time import sleep
 
+
+STATIC_VIDEO_PATH = Path("./stock/static_low_1.mp4")
 
 class Status(Enum):
     IDLE = 0
@@ -14,11 +17,16 @@ class Status(Enum):
     DOWNLOADING = 2
 
 class Operating_Context:
-    def __init__(self, status=Status.IDLE, cache_manager=Video_Cache_Manager(), cur_video=None):
+    def __init__(self, status=Status.IDLE, cache_manager=Video_Cache_Manager(), cur_video=None, load_manager=False):
         self.status=status
-        self.cache_manager = cache_manager
+        if load_manager:
+            self.cache_manager = Video_Cache_Manager.load()
+        else:
+            self.cache_manager = cache_manager
         self.cur_video = cur_video
         self.seen_videos = set()
+
+        self.player = None
 
 def reload_playlist(context, videos_per_channel=5):
     context.cache_manager.clear_all()
@@ -44,27 +52,33 @@ def downloading(context, videos_predownloaded = 3):
 
 
 def playing(context):
-    from omxplayer.player import OMXPlayer
     context.status = Status.PLAYING
     cur_video = context.cache_manager.peek_video()
 
-    player = OMXPlayer(cur_video.disk_path)
-    sleep(2.5)
-    player.pause()
-    sleep(2)
-    player.set_aspect_mode('stretch')
-    player.play()
-    sleep(5)
-
 
     if cur_video.is_ready():
-        pass
+        play_context_video(context, video_path=cur_video.disk_path)
     else:
-        pass
+        print("VIDEO IS NOT READY U BUM")
+
+
+def quit_context_player(context):
+    if context.player != None:
+        context.player.quit()
+
+def play_context_video(context, video_path):
+    quit_context_player(context)
+    context.player = OMXPlayer(video_path)
+    # context.player.set_aspect_mode('stretch')
+    context.player.play()
+    context.player.play()
+
 
 def idling(context, guaranteed_videos=5):
     context.status = Status.IDLE
     print("IDLING, finding videos to watch")
+
+    play_context_video(context, STATIC_VIDEO_PATH)
 
     if not context.cache_manager.queue_size() >= guaranteed_videos:
         num_videos = 5
@@ -96,7 +110,7 @@ if __name__ == "__main__":
     # while cache_manager.data_struct.size() > 0:
     #     cur_video = cache_manager.pop_video(delete=True)
     #     print(cur_video.name)
-    context = Operating_Context()
+    context = Operating_Context(load_manager=True)
     print(context.seen_videos)
     if context.status == Status.IDLE:
         idling(context)
