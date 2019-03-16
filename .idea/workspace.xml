@@ -88,7 +88,7 @@
         <entry file="file://$PROJECT_DIR$/Cache_Manager.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="363">
-              <caret line="111" column="84" lean-forward="false" selection-start-line="111" selection-start-column="84" selection-end-line="111" selection-end-column="84" />
+              <caret line="111" column="50" lean-forward="false" selection-start-line="111" selection-start-column="50" selection-end-line="111" selection-end-column="50" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -581,7 +581,7 @@
     <entry file="file://$PROJECT_DIR$/Cache_Manager.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="363">
-          <caret line="111" column="84" lean-forward="false" selection-start-line="111" selection-start-column="84" selection-end-line="111" selection-end-column="84" />
+          <caret line="111" column="50" lean-forward="false" selection-start-line="111" selection-start-column="50" selection-end-line="111" selection-end-column="50" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
