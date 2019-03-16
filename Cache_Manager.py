@@ -103,8 +103,7 @@ class Video_Cache_Manager:
     ###################
 
     def save(self):
-        with open(str(self.save_dir), "w") as file:
-            pickle.dump(self, file)
+        pickle.dump(str(self.save_dir), file)
 
     @staticmethod
     def load(save_dir=DEFAULT_SAVE_DIR):
