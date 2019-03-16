@@ -9,7 +9,7 @@ from pathlib import Path
 from time import sleep
 
 
-STATIC_VIDEO_PATH = Path("./stock/static_low_1.mp4")
+STATIC_VIDEO_PATH = Path("./stock/static_low_q.mp4")
 
 class Status(Enum):
     IDLE = 0
