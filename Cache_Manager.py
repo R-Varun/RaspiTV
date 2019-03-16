@@ -109,7 +109,7 @@ class Video_Cache_Manager:
     @staticmethod
     def load(save_dir=DEFAULT_SAVE_DIR):
         if Path(save_dir).exists():
-            return pickle.load(open(str(save_dir)))
+            return pickle.load(open(str(save_dir), "rb"))
         return None
 
 if __name__ == "__main__":
